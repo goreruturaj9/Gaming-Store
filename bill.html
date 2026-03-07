@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bill - Gaming Store</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .bill-container {
+            max-width: 800px;
+            margin: 50px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .bill-header {
+            text-align: center;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .bill-header h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        .customer-info, .order-info {
+            margin-bottom: 30px;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .bill-items {
+            margin: 30px 0;
+        }
+        .bill-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .bill-total {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: right;
+        }
+        .bill-total h2 {
+            color: #667eea;
+        }
+        .qr-container {
+            text-align: center;
+            margin: 30px 0;
+            padding: 30px;
+            background: #f9fafb;
+            border-radius: 12px;
+        }
+        .print-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+        }
+        .print-btn:hover {
+            background: #5568d3;
+        }
+        @media print {
+            .print-btn, .back-btn { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bill-container">
+        <div class="bill-header">
+            <h1>🎮 Gaming Store</h1>
+            <p>Invoice / Bill</p>
+        </div>
+
+        <div class="customer-info">
+            <h3>Customer Information</h3>
+            <div class="info-row">
+                <span>Name:</span>
+                <strong id="billCustomerName"></strong>
+            </div>
+            <div class="info-row">
+                <span>Phone:</span>
+                <strong id="billCustomerPhone"></strong>
+            </div>
+        </div>
+
+        <div class="order-info">
+            <h3>Order Information</h3>
+            <div class="info-row">
+                <span>Order ID:</span>
+                <strong id="billOrderId"></strong>
+            </div>
+            <div class="info-row">
+                <span>Date:</span>
+                <strong id="billDate"></strong>
+            </div>
+            <div class="info-row">
+                <span>Payment Method:</span>
+                <strong id="billPaymentMethod"></strong>
+            </div>
+        </div>
+
+        <div class="bill-items">
+            <h3>Items</h3>
+            <div id="billItemsList"></div>
+        </div>
+
+        <div class="bill-total">
+            <h2>Total Amount: $<span id="billTotalAmount"></span></h2>
+        </div>
+
+        <div class="qr-container">
+            <h3>Scan to Pay</h3>
+            <div id="billQRCode"></div>
+            <p style="color: #666; margin-top: 15px;">Scan to contact on Instagram for payment</p>
+        </div>
+
+        <div style="text-align: center;">
+            <button class="print-btn" onclick="window.print()">Print Bill</button>
+            <button class="print-btn back-btn" onclick="window.location.href='index.html'">Back to Store</button>
+        </div>
+    </div>
+
+    <script>
+        // Get data from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const billData = JSON.parse(decodeURIComponent(urlParams.get('data')));
+
+        // Display customer info
+        document.getElementById('billCustomerName').textContent = billData.customerName;
+        document.getElementById('billCustomerPhone').textContent = billData.customerPhone;
+
+        // Display order info
+        document.getElementById('billOrderId').textContent = billData.orderId;
+        document.getElementById('billDate').textContent = new Date().toLocaleString();
+        document.getElementById('billPaymentMethod').textContent = billData.paymentMethod.toUpperCase();
+
+        // Display items
+        const itemsList = document.getElementById('billItemsList');
+        itemsList.innerHTML = billData.items.map(item => `
+            <div class="bill-item">
+                <div>
+                    <strong>${item.name}</strong><br>
+                    <span>$${item.price} x ${item.quantity}</span>
+                </div>
+                <strong>$${item.price * item.quantity}</strong>
+            </div>
+        `).join('');
+
+        // Display total
+        document.getElementById('billTotalAmount').textContent = billData.total;
+
+        // Display QR code
+        const instagramLink = 'https://www.instagram.com/ruturajgorepatil_45?igsh=amJrcmtkN3VxcXdx';
+        document.getElementById('billQRCode').innerHTML = `
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(instagramLink)}" 
+                 alt="Payment QR Code" style="width: 300px; height: 300px;">
+        `;
+    </script>
+</body>
+</html>
